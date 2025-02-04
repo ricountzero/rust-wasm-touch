@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+  </head>
+  <body>
+    <script type="module">
+      import init, { greet } from './pkg/rust_wasm_touch.js';
+
+      async function run() {
+        await init();
+        greet("User!");
+      }
+
+      run();
+    </script>
+  </body>
+</html>
