@@ -3,7 +3,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
 extern crate js_sys;
 
-pub fn init_webgl_context(canvas_id: &str) -> Result<WebGlRenderingContext, JsValue> {
+fn init_webgl_context(canvas_id: &str) -> Result<WebGlRenderingContext, JsValue> {
     let document = web_sys::window().unwrap().document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).unwrap();
     let canvas: web_sys::HtmlCanvasElement = canvas.dyn_into::<web_sys::HtmlCanvasElement>()?;
@@ -17,7 +17,7 @@ pub fn init_webgl_context(canvas_id: &str) -> Result<WebGlRenderingContext, JsVa
     Ok(gl)
 }
 
-pub fn create_shader(
+fn create_shader(
     gl: &WebGlRenderingContext,
     shader_type: u32,
     source: &str,
@@ -42,7 +42,7 @@ pub fn create_shader(
     }
 }
 
-pub fn setup_shaders(gl: &WebGlRenderingContext) -> Result<WebGlProgram, JsValue> {
+fn setup_shaders(gl: &WebGlRenderingContext) -> Result<WebGlProgram, JsValue> {
     let vertex_shader_source = "
         attribute vec3 coordinates;
         void main(void) {
@@ -89,7 +89,7 @@ pub fn setup_shaders(gl: &WebGlRenderingContext) -> Result<WebGlProgram, JsValue
     }
 }
 
-pub fn setup_vertices(gl: &WebGlRenderingContext, vertices: &[f32], shader_program: &WebGlProgram) {
+fn setup_vertices(gl: &WebGlRenderingContext, vertices: &[f32], shader_program: &WebGlProgram) {
     let vertices_array = unsafe { js_sys::Float32Array::view(vertices) };
     let vertex_buffer = gl.create_buffer().unwrap();
 
@@ -112,22 +112,14 @@ pub fn setup_vertices(gl: &WebGlRenderingContext, vertices: &[f32], shader_progr
     gl.enable_vertex_attrib_array(coordinates_location as u32);
 }
 
-#[wasm_bindgen]
-pub fn draw_triangle(
-    canvas_id: &str,
-    selected_color: Option<Vec<f32>>,
-) -> Result<WebGlRenderingContext, JsValue> {
-    let gl: WebGlRenderingContext = init_webgl_context(canvas_id)?;
-    let shader_program: WebGlProgram = setup_shaders(&gl)?;
-    let vertices: [f32; 9] = [
-        0.0, 0.5, 0.0,  // top
-        -0.5, -0.5, 0.0, // bottom left
-        0.5, -0.5, 0.0,  // bottom right
-    ];
-
+fn draw_triangles_with_color(
+    gl: &WebGlRenderingContext,
+    shader_program: &WebGlProgram,
+    vertices: &[f32],
+    color: Vec<f32>,
+) {
     setup_vertices(&gl, &vertices, &shader_program);
 
-    let color = selected_color.unwrap_or_else(|| vec![1.0, 0.0, 0.0, 1.0]);
     let color_location = gl
         .get_uniform_location(&shader_program, "fragColor")
         .unwrap();
@@ -138,6 +130,24 @@ pub fn draw_triangle(
         0,
         (vertices.len() / 3) as i32,
     );
+}
+
+#[wasm_bindgen]
+pub fn draw_triangle(
+    canvas_id: &str,
+    selected_color: Option<Vec<f32>>,
+) -> Result<WebGlRenderingContext, JsValue> {
+    let gl: WebGlRenderingContext = init_webgl_context(canvas_id)?;
+    let shader_program: WebGlProgram = setup_shaders(&gl)?;
+
+    let vertices: [f32; 9] = [
+        0.0, 0.5, 0.0,  // top
+        -0.5, -0.5, 0.0, // bottom left
+        0.5, -0.5, 0.0,  // bottom right
+    ];
+
+    let color = selected_color.unwrap_or_else(|| vec![1.0, 0.0, 0.0, 1.0]);
+    draw_triangles_with_color(&gl, &shader_program, &vertices, color);
 
     Ok(gl)
 }
@@ -165,21 +175,8 @@ pub fn draw_triangles(
         })
         .collect();
 
-    setup_vertices(&gl, &vertices, &shader_program);
-
-    // Set the color for all triangles
     let color = selected_color.unwrap_or_else(|| vec![1.0, 0.0, 0.0, 1.0]);
-    let color_location = gl
-        .get_uniform_location(&shader_program, "fragColor")
-        .unwrap();
-    gl.uniform4fv_with_f32_array(Some(&color_location), &color);
-
-    // Draw all 100 triangles (300 vertices)
-    gl.draw_arrays(
-        WebGlRenderingContext::TRIANGLES,
-        0,
-        (vertices.len() / 3) as i32, // Each triangle has 3 vertices
-    );
+    draw_triangles_with_color(&gl, &shader_program, &vertices, color);
 
     Ok(gl)
 }
