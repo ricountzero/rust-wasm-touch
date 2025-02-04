@@ -11,12 +11,12 @@
 <body>
     <canvas id="triangle" width="800" height="800"></canvas>
     <script type="module">
-        import init, { draw_triangle } from "../pkg/rust_wasm_touch.js";
+        import init, { draw_triangles } from "../pkg/rust_wasm_touch.js";
         const CANVAS_ID = "triangle";
         const color = [1.0, 0.0, 0.0, 1.0];
 
         init().then(() => {
-            draw_triangle(CANVAS_ID, color);
+            draw_triangles(CANVAS_ID, color);
         });
     </script>
 </body>

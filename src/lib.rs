@@ -1,3 +1,4 @@
+use rand::Rng;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
@@ -162,15 +163,17 @@ pub fn draw_triangles(
 
     // Define 100 triangles (300 vertices)
     let vertices: Vec<f32> = (0..100)
-        .flat_map(|i| {
-            // Adjust the position of each triangle slightly, e.g., offset each triangle's position
-            let x_offset = i as f32 * 0.3;
-            let y_offset = i as f32 * 0.3;
+        .flat_map(|_| {
+            let mut rng = rand::thread_rng();
+
+            // Generate random offsets for each triangle's position
+            let x_offset = rng.gen_range(-0.5..0.5); // Random x position within canvas range
+            let y_offset = rng.gen_range(-0.5..0.5); // Random y position within canvas range
 
             vec![
-                0.0 + x_offset, 0.5 + y_offset, 0.0,     // top
-                -0.5 + x_offset, -0.5 + y_offset, 0.0,   // bottom left
-                0.5 + x_offset, -0.5 + y_offset, 0.0,    // bottom right
+                0.0 + x_offset, 0.05 + y_offset, 0.0,     // top
+                -0.05 + x_offset, -0.05 + y_offset, 0.0,   // bottom left
+                0.05 + x_offset, -0.05 + y_offset, 0.0,    // bottom right
             ]
         })
         .collect();
