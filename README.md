@@ -1,5 +1,5 @@
 # rust-wasm-touch
-Simple WebAssembly on Rust draws blue circle with 2D Canvas. Try to use CPU-based rendering.
+Simple WebAssembly on Rust draws red triangle. Try to use GPU-based rendering.
 
 You have to have pre-installed `cargo install wasm-bindgen-cli`.
 
