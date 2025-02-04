@@ -1,5 +1,5 @@
 # rust-wasm-touch
-Simple WebAssembly on Rust shows an alert with a string from JavaScript.
+Simple WebAssembly on Rust draws blue circle with 2D Canvas. Try to use CPU-based rendering.
 
 You have to have pre-installed `cargo install wasm-bindgen-cli`.
 
