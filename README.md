@@ -1,5 +1,5 @@
 # rust-wasm-touch
-Simple WebAssembly on Rust draws red triangle. Try to use GPU-based rendering.
+A simple WebAssembly module in Rust draws a bunch of triangles. Try to use GPU-based rendering.
 
 You have to have pre-installed `cargo install wasm-bindgen-cli`.
 
